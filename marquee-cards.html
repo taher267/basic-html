@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Testimonial Marquee (Hover to Pause)</title>
+    <!-- <link rel="stylesheet" href="./style.css" /> -->
+    <style>
+      :root {
+        --card-w: 320px;
+        --card-h: 190px;
+        --gap: 20px;
+        /* different speeds per row for a natural look */
+        --speed-1: 38s;
+        --speed-2: 32s;
+        --speed-3: 44s;
+        --radius: 16px;
+      }
+
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+          "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+          "Segoe UI Emoji";
+        background: #f5f7fb;
+        color: #111827;
+      }
+
+      .wrap {
+        max-width: 1200px;
+        margin: 48px auto;
+        padding: 0 16px 32px;
+      }
+
+      h1 {
+        margin: 0 0 10px;
+        font-size: clamp(22px, 3.2vw, 32px);
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+      p.lead {
+        margin: 0 0 28px;
+        color: #6b7280;
+      }
+
+      /* ---------- Row (marquee) ---------- */
+      .row {
+        position: relative;
+        overflow: hidden; /* hides the flowing track */
+        margin: 18px 0 28px;
+        mask-image: linear-gradient(
+          to right,
+          transparent 0,
+          black 8%,
+          black 92%,
+          transparent 100%
+        );
+        -webkit-mask-image: linear-gradient(
+          to right,
+          transparent 0,
+          black 8%,
+          black 92%,
+          transparent 100%
+        );
+        padding: 8px 0;
+      }
+
+      .row .track {
+        display: flex;
+        gap: var(--gap);
+        width: max-content; /* shrink-wrap so the animation translates the total width */
+        will-change: transform;
+        animation: scroll var(--row-speed, 36s) linear infinite;
+      }
+
+      .row.reverse .track {
+        animation-name: scroll-rev;
+      }
+
+      /* Pause the entire row when hovered */
+      .row:hover .track {
+        animation-play-state: paused;
+      }
+
+      /* Make sure rows are tall enough for cards */
+      .row,
+      .card {
+        height: var(--card-h);
+      }
+
+      /* ---------- Card ---------- */
+      .card {
+        width: var(--card-w);
+        background: white;
+        border-radius: var(--radius);
+        box-shadow: 0 6px 18px rgba(17, 24, 39, 0.08);
+        display: grid;
+        grid-template-rows: auto 1fr;
+        overflow: hidden;
+      }
+
+      .card-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px 0 14px;
+      }
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #c7d2fe, #e9d5ff);
+        display: grid;
+        place-items: center;
+        color: #4338ca;
+        font-weight: 700;
+        font-size: 13px;
+      }
+      .name {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 1.1;
+      }
+      .meta {
+        font-size: 12px;
+        color: #6b7280;
+      }
+
+      .stars {
+        display: flex;
+        gap: 2px;
+        margin-left: auto;
+      }
+      .stars svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      .card-body {
+        padding: 10px 14px 14px;
+        display: grid;
+        grid-template-columns: 1fr 68px;
+        gap: 10px;
+        align-items: stretch;
+      }
+
+      .blurb {
+        font-size: 14px;
+        color: #374151;
+        line-height: 1.35;
+        background: #f9fafb;
+        border-radius: 12px;
+        padding: 10px 12px;
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+
+      .thumb {
+        position: relative;
+        background: #e5e7eb;
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      .thumb:before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+              120px 80px at 70% 20%,
+              #d1d5db 35%,
+              transparent 36%
+            )
+            top left/100% 100% no-repeat,
+          linear-gradient(#f3f4f6, #e5e7eb);
+        opacity: 0.9;
+      }
+      .play {
+        position: absolute;
+        inset: auto auto 8px 8px;
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: #111827;
+        color: #fff;
+      }
+      .play svg {
+        width: 16px;
+        height: 16px;
+      }
+
+      /* ---------- Animations ---------- */
+      @keyframes scroll {
+        from {
+          transform: translateX(0);
+        }
+        to {
+          transform: translateX(calc(-50% - var(--gap) / 2));
+        } /* we duplicate items; move by half */
+      }
+      @keyframes scroll-rev {
+        from {
+          transform: translateX(calc(-50% - var(--gap) / 2));
+        }
+        to {
+          transform: translateX(0);
+        }
+      }
+
+      /* ---------- Utilities ---------- */
+      .tag {
+        display: inline-block;
+        font-size: 11px;
+        color: #6b7280;
+        background: #f3f4f6;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+
+      /* Responsive tweaks */
+      @media (max-width: 640px) {
+        :root {
+          --card-w: 270px;
+          --card-h: 180px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Client Testimonials</h1>
+      <p class="lead">
+        Auto-scrolling marquee. Hover any row to pause; items loop seamlessly.
+      </p>
+
+      <!-- Row 1 -->
+      <div class="row" style="--row-speed: var(--speed-1)">
+        <div class="track">
+          <!-- 8 unique cards -->
+          <!-- Card 1 -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">TT</div>
+              <div>
+                <div class="name">Taher</div>
+                <div class="meta">today</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">Wrigint someting</div>
+              <div class="thumb">
+                <span class="play" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">FT</div>
+              <div>
+                <div class="name">Fozlol Taher</div>
+                <div class="meta">Marketing</div>
+              </div>
+              <span class="tag">LinkedIn</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">zassffssd</div>
+              <div class="thumb">
+                <span class="play">
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">FT</div>
+              <div>
+                <div class="name">Fozlol Taher</div>
+                <div class="meta">—</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">jkhgfdghjk</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 4 -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">NM</div>
+              <div>
+                <div class="name">Name is Mandatory</div>
+                <div class="meta">—</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">fsdafdasfdsa</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 5 -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">RA</div>
+              <div>
+                <div class="name">Rick Astley</div>
+                <div class="meta">Famous Artist</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Welcome to Senja 👋 Click this demo testimonial to see how you
+                can view, edit or share it.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- duplicate the same 5 again to make the loop seamless -->
+          <!-- (You can also paste different ones.) -->
+          <!-- DUPLICATES -->
+          <!-- Simply copy the same five cards again -->
+          <article class="card">
+            <!-- d1 -->
+            <header class="card-head">
+              <div class="avatar">TT</div>
+              <div>
+                <div class="name">Taher</div>
+                <div class="meta">today</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">Wrigint someting</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <!-- d2 -->
+            <header class="card-head">
+              <div class="avatar">FT</div>
+              <div>
+                <div class="name">Fozlol Taher</div>
+                <div class="meta">Marketing</div>
+              </div>
+              <span class="tag">LinkedIn</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">zassffssd</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <!-- d3 -->
+            <header class="card-head">
+              <div class="avatar">FT</div>
+              <div>
+                <div class="name">Fozlol Taher</div>
+                <div class="meta">—</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">jkhgfdghjk</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <!-- d4 -->
+            <header class="card-head">
+              <div class="avatar">NM</div>
+              <div>
+                <div class="name">Name is Mandatory</div>
+                <div class="meta">—</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">fsdafdasfdsa</div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <!-- d5 -->
+            <header class="card-head">
+              <div class="avatar">RA</div>
+              <div>
+                <div class="name">Rick Astley</div>
+                <div class="meta">Famous Artist</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Welcome to Senja 👋 Click this demo testimonial to see how you
+                can view, edit or share it.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Row 2 (reverse direction) -->
+      <div class="row reverse" style="--row-speed: var(--speed-2)">
+        <div class="track">
+          <!-- Use fewer example cards; duplicate for loop -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">LK</div>
+              <div>
+                <div class="name">LinkedIn</div>
+                <div class="meta">Video</div>
+              </div>
+              <span class="tag">Platform</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                A short note about the testimonial video and results delivered.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">ZT</div>
+              <div>
+                <div class="name">Zawwad</div>
+                <div class="meta">Founder</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Their team never let us down. Smooth process and quick delivery.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">AM</div>
+              <div>
+                <div class="name">Amanda</div>
+                <div class="meta">PM</div>
+              </div>
+              <span class="tag">Case Study</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Saw +32% CVR lift after rolling out the new pages.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- duplicates -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">LK</div>
+              <div>
+                <div class="name">LinkedIn</div>
+                <div class="meta">Video</div>
+              </div>
+              <span class="tag">Platform</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                A short note about the testimonial video and results delivered.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">ZT</div>
+              <div>
+                <div class="name">Zawwad</div>
+                <div class="meta">Founder</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Their team never let us down. Smooth process and quick delivery.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">AM</div>
+              <div>
+                <div class="name">Amanda</div>
+                <div class="meta">PM</div>
+              </div>
+              <span class="tag">Case Study</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Saw +32% CVR lift after rolling out the new pages.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- Row 3 -->
+      <div class="row" style="--row-speed: var(--speed-3)">
+        <div class="track">
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">AA</div>
+              <div>
+                <div class="name">Ayesha</div>
+                <div class="meta">Ops</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Quick edits, friendly team, and great output. Will return for
+                more.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">JB</div>
+              <div>
+                <div class="name">Jahid</div>
+                <div class="meta">QA</div>
+              </div>
+              <span class="tag">Verified</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Solid 5/5. The whole flow from brief to delivery was smooth.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">MS</div>
+              <div>
+                <div class="name">Mostafa</div>
+                <div class="meta">Engineer</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                The UI looks premium and the performance is snappy.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+
+          <!-- duplicates -->
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">AA</div>
+              <div>
+                <div class="name">Ayesha</div>
+                <div class="meta">Ops</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Quick edits, friendly team, and great output. Will return for
+                more.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">JB</div>
+              <div>
+                <div class="name">Jahid</div>
+                <div class="meta">QA</div>
+              </div>
+              <span class="tag">Verified</span>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                Solid 5/5. The whole flow from brief to delivery was smooth.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+          <article class="card">
+            <header class="card-head">
+              <div class="avatar">MS</div>
+              <div>
+                <div class="name">Mostafa</div>
+                <div class="meta">Engineer</div>
+              </div>
+              <div class="stars" aria-label="4 out of 5 stars">⭐⭐⭐⭐☆</div>
+            </header>
+            <div class="card-body">
+              <div class="blurb">
+                The UI looks premium and the performance is snappy.
+              </div>
+              <div class="thumb">
+                <span class="play"
+                  ><svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8 5v14l11-7z" /></svg
+                ></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
